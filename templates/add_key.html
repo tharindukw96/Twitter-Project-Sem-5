@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Sentdex Analysis</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+    <link rel="shortcut icon" href="/static/images/dark/favicon.ico">
+</head>
+
+<header>
+    <div class="navbar-header" style='float:left'>
+        <a class="navbar-brand" rel="home" href="/" title="Sentdex Analysis">
+            <img style="max-height:160px; max-width:100%; margin-top: -5px;"
+                src="http://sentdex.com/static/images/dark/sentdex-long-banner-dark.png">
+        </a>
+    </div>
+
+    <div class="container" style='margin-left:60%'>
+        <ul class="nav navbar-nav navbar-right">
+            <ul class="nav nav-pills">
+                <a href="/"><button type="button" class="btn btn-dark"
+                        style=" margin-top: 38px; margin-bottom: 5px; height:35px; margin-right: 5px; margin-left: 15px">
+                        <span class="glyphicon glyphicon-signal"></span> Home
+                    </button></a>
+                <a href="/add"><button type="button" class="btn btn-dark"
+                        style=" margin-top: 38px; margin-bottom: 5px; height:35px;">
+                        <span class="glyphicon glyphicon-king"></span> Add keyword
+                    </button></a>
+                <a href="/geographical-analysis/"><button type="button" class="btn btn-dark"
+                        style=" margin-top: 38px; margin-bottom: 5px; height:35px; margin-left: 5px; margin-right: 5px">
+                        <span class="glyphicon glyphicon-globe"></span> About
+                    </button></a>
+            </ul>
+        </ul>
+    </div>
+    <br><br>
+</header>
+<br>
+
+<body class='body'>
+    <div class="container" style="min-height:100%">
+        <div class="row">
+            <div class='col-md-12'>
+                <p style='float:left'><strong>Add new keyword to analyze.</strong></p>
+            </div>
+        </div>
+    </div>
+    <div class='container'>
+        <div class='row'>
+            <div class='container'>
+                <div class='col-md-6' style=" margin-left: auto;margin-right: auto;">
+                    <form action="/add_key" method='POST'>
+                        <div class="form-group">
+                            <label for="key">New Keyword:</label>
+                            <input type="text" class="form-control" id="key" name='key'>
+                        </div>
+                        <button type="submit" class="btn btn-dark">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>

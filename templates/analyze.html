@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Sentdex Analysis</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+    <link rel="shortcut icon" href="/static/images/dark/favicon.ico">
+
+    <!--Load high stock js-->
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://code.highcharts.com/stock/highstock.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
+
+    <!--High map js-->
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/maps/modules/map.js"></script>
+    <script src="https://code.highcharts.com/mapdata/custom/world.js"></script>
+
+    <!-- Flag sprites service provided by Martijn Lafeber, https://github.com/lafeber/world-flags-sprite/blob/master/LICENSE -->
+    <link rel="stylesheet" type="text/css" href="//github.com/downloads/lafeber/world-flags-sprite/flags32.css" />
+
+
+
+
+</head>
+
+<header>
+    <div class="navbar-header" style='float:left'>
+        <a class="navbar-brand" rel="home" href="/" title="Sentdex Analysis">
+            <img style="max-height:160px; max-width:100%; margin-top: -5px;"
+                src="http://sentdex.com/static/images/dark/sentdex-long-banner-dark.png">
+        </a>
+    </div>
+
+    <div class="container" style='margin-left:60%'>
+        <ul class="nav navbar-nav navbar-right">
+            <ul class="nav nav-pills">
+                <a href="/"><button type="button" class="btn btn-dark"
+                        style=" margin-top: 38px; margin-bottom: 5px; height:35px; margin-right: 5px; margin-left: 15px">
+                        <span class="glyphicon glyphicon-signal"></span> Home
+                    </button></a>
+                <a href="/add"><button type="button" class="btn btn-dark"
+                        style=" margin-top: 38px; margin-bottom: 5px; height:35px;">
+                        <span class="glyphicon glyphicon-king"></span> Add keyword
+                    </button></a>
+                <a href="/geographical-analysis/"><button type="button" class="btn btn-dark"
+                        style=" margin-top: 38px; margin-bottom: 5px; height:35px; margin-left: 5px; margin-right: 5px">
+                        <span class="glyphicon glyphicon-globe"></span> About
+                    </button></a>
+            </ul>
+        </ul>
+    </div>
+    <br><br>
+</header>
+<br>
+
+<body class='body'>
+    <div class="container" style="min-height:100%">
+        <div class="row">
+            <div class='col-md-12'>
+                <p style='float:left'><strong>{{title}} Tweet analyze report.</strong></p>
+            </div>
+        </div>
+    </div>
+    <div class='container'>
+        <div class='row'>
+            <div class='container'>
+
+                <div class="btn-toolbar" role="toolbar">
+
+                    <div class="btn-group " style='margin-right:2px'><a href="/analyze?i={{title}}&tf=7d"><button
+                                type="button" class="btn btn-dark navbar-btn">7 days</button></a></div>
+                    <div class="btn-group" style='margin-right:2px'><a href="/analyze?i={{title}}&tf=30d"><button
+                                type="button" class="btn btn-dark navbar-btn">30 Days</button></a></div>
+                    <div class="btn-group" style='margin-right:2px'><a href="/analyze?i={{title}}&tf=6m"><button
+                                type="button" class="btn btn-dark navbar-btn">6 months</button></a></div>
+                    <div class="btn-group" style='margin-right:2px'><a href="/analyze?i={{title}}&tf=1y"><button
+                                type="button" class="btn btn-dark navbar-btn">1 Year</button></a></div>
+                    <div class="btn-group" style='margin-right:2px'><a href="/analyze?i={{title}}&tf=all"><button
+                                type="button" class="btn btn-dark navbar-btn">All-Time</button></a></div>
+                </div>
+                <br>
+                <div class='row container' id='time_line'>
+                    <h4>{{title}} Emotion Timeline</h4>
+                </div>
+
+                <div class='row container' id='heat_map'>
+                    <h4>Emotion Heat Map</h4>
+                    <div id="wrapper">
+                        <div id="container"></div>
+                        <div id="info">
+                            <span class="f32"><span id="flag"></span></span>
+                            <h2></h2>
+                            <div class="subheader">Click countries to view history</div>
+                            <div id="country-chart"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class='row'>
+                    <div class='col-md-8'>
+                        <div class='container' id='word_cloud'>
+                            <h4>Word Cloud</h4>
+                            <div class='row'>
+                                <div class='col-md-6'>
+                                    <img src="./image/{{title}}-Sad-{{tf}}.png" class="img-thumbnail" alt="Cinque Terre">
+                                </div>
+                                <div class='col-md-6'>
+                                    <img src="./image/{{title}}-Anger-{{tf}}.png" class="img-thumbnail" alt="Cinque Terre">
+                                </div>
+                            </div>
+                            <div class='row'>
+                                <div class='col-md-6'>
+                                    <img src="./image/{{title}}-Fear-{{tf}}.png" class="img-thumbnail" alt="Cinque Terre">
+                                </div>
+                                <div class='col-md-6'>
+                                    <img src="./image/{{title}}-Happy-{{tf}}.png" class="img-thumbnail" alt="Cinque Terre">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='col-md-4'>
+                        <div class='container' id='tweets'>
+                            <h4>Tweet Board</h4>
+                            <div id='tweet-board' style='overflow: scroll;max-width:300px;max-height:320px;font-size:12px;'>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+
+<!--High stock js-->
+<script>
+
+    var seriesOptions = [],
+        seriesCounter = 0,
+        names = ['Happy','Fear','Anger','Sad'] /* 'Fear','Happy'];*/
+
+    /**
+     * Create the chart when all data is loaded
+     * @returns {undefined}
+     */
+    function createChart() {
+
+        Highcharts.stockChart('time_line', {
+
+            rangeSelector: {
+                selected: 4
+            },
+
+            yAxis: {
+                labels: {
+                    formatter: function () {
+                        return (this.value > 0 ? ' + ' : '') + this.value + '%';
+                    }
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 2,
+                    color: 'silver'
+                }]
+            },
+
+            plotOptions: {
+                series: {
+                    compare: 'percent',
+                    showInNavigator: true
+                }
+            },
+
+            tooltip: {
+                pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.change}%)<br/>',
+                valueDecimals: 2,
+                split: true
+            },
+
+            series: seriesOptions
+        });
+    }
+
+    $.each(names, function (i, name) {
+
+        $.getJSON('/data?i={{i}}&tf={{tf}}&emotion=' + name, function (data) {
+
+            seriesOptions[i] = {
+                name: name,
+                data: data
+            };
+
+            // As we're loading the data asynchronously, we don't know what order it will arrive. So
+            // we keep a counter and create the chart when all the data is loaded.
+            seriesCounter += 1;
+
+            if (seriesCounter === names.length) {
+                createChart();
+            }
+        });
+    });
+</script>
+
+<!--Heat map js-->
+<script>
+
+    $.ajax({
+        url: 'https://cdn.jsdelivr.net/gh/highcharts/highcharts@v7.0.0/samples/data/world-population-history.csv',
+        success: function (csv) {
+
+            // Parse the CSV Data
+            /*Highcharts.data({
+                csv: data,
+                switchRowsAndColumns: true,
+                parsed: function () {
+                    console.log(this.columns);
+                }
+            });*/
+
+            // Very simple and case-specific CSV string splitting
+            function CSVtoArray(text) {
+                return text.replace(/^"/, '')
+                    .replace(/",$/, '')
+                    .split('","');
+            }
+
+            csv = csv.split(/\n/);
+
+            var countries = {},
+                mapChart,
+                countryChart,
+                numRegex = /^[0-9\.]+$/,
+                lastCommaRegex = /,\s$/,
+                quoteRegex = /\"/g,
+                categories = CSVtoArray(csv[2]).slice(4);
+
+            // Parse the CSV into arrays, one array each country
+            $.each(csv.slice(3), function (j, line) {
+                var row = CSVtoArray(line),
+                    data = row.slice(4);
+
+                $.each(data, function (i, val) {
+                    val = val.replace(quoteRegex, '');
+                    if (numRegex.test(val)) {
+                        val = parseInt(val, 10);
+                    } else if (!val || lastCommaRegex.test(val)) {
+                        val = null;
+                    }
+                    data[i] = val;
+                });
+
+                countries[row[1]] = {
+                    name: row[0],
+                    code3: row[1],
+                    data: data
+                };
+            });
+
+            // For each country, use the latest value for current population
+            var data = [];
+            for (var code3 in countries) {
+                if (countries.hasOwnProperty(code3)) {
+                    var value = null,
+                        year,
+                        itemData = countries[code3].data,
+                        i = itemData.length;
+
+                    while (i--) {
+                        if (typeof itemData[i] === 'number') {
+                            value = itemData[i];
+                            year = categories[i];
+                            break;
+                        }
+                    }
+                    data.push({
+                        name: countries[code3].name,
+                        code3: code3,
+                        value: value,
+                        year: year
+                    });
+                }
+            }
+
+            // Add lower case codes to the data set for inclusion in the tooltip.pointFormat
+            var mapData = Highcharts.geojson(Highcharts.maps['custom/world']);
+            $.each(mapData, function () {
+                this.id = this.properties['hc-key']; // for Chart.get()
+                this.flag = this.id.replace('UK', 'GB').toLowerCase();
+            });
+
+            // Wrap point.select to get to the total selected points
+            Highcharts.wrap(Highcharts.Point.prototype, 'select', function (proceed) {
+
+                proceed.apply(this, Array.prototype.slice.call(arguments, 1));
+
+                var points = mapChart.getSelectedPoints();
+                if (points.length) {
+                    if (points.length === 1) {
+                        $('#info #flag').attr('class', 'flag ' + points[0].flag);
+                        $('#info h2').html(points[0].name);
+                    } else {
+                        $('#info #flag').attr('class', 'flag');
+                        $('#info h2').html('Comparing countries');
+
+                    }
+                    $('#info .subheader').html('<h4>Historical population</h4><small><em>Shift + Click on map to compare countries</em></small>');
+
+                    if (!countryChart) {
+                        countryChart = Highcharts.chart('country-chart', {
+                            chart: {
+                                height: 250,
+                                spacingLeft: 0
+                            },
+                            credits: {
+                                enabled: false
+                            },
+                            title: {
+                                text: null
+                            },
+                            subtitle: {
+                                text: null
+                            },
+                            xAxis: {
+                                tickPixelInterval: 50,
+                                crosshair: true
+                            },
+                            yAxis: {
+                                title: null,
+                                opposite: true
+                            },
+                            tooltip: {
+                                split: true
+                            },
+                            plotOptions: {
+                                series: {
+                                    animation: {
+                                        duration: 500
+                                    },
+                                    marker: {
+                                        enabled: false
+                                    },
+                                    threshold: 0,
+                                    pointStart: parseInt(categories[0], 10)
+                                }
+                            }
+                        });
+                    }
+
+                    countryChart.series.slice(0).forEach(function (s) {
+                        s.remove(false);
+                    });
+                    points.forEach(function (p) {
+                        countryChart.addSeries({
+                            name: p.name,
+                            data: countries[p.code3].data,
+                            type: points.length > 1 ? 'line' : 'area'
+                        }, false);
+                    });
+                    countryChart.redraw();
+
+                } else {
+                    $('#info #flag').attr('class', '');
+                    $('#info h2').html('');
+                    $('#info .subheader').html('');
+                    if (countryChart) {
+                        countryChart = countryChart.destroy();
+                    }
+                }
+            });
+
+            // Initiate the map chart
+            mapChart = Highcharts.mapChart('container', {
+
+                title: {
+                    text: 'Population history by country'
+                },
+
+                subtitle: {
+                    text: 'Source: <a href="http://data.worldbank.org/indicator/SP.POP.TOTL/countries/1W?display=default">The World Bank</a>'
+                },
+
+                mapNavigation: {
+                    enabled: true,
+                    buttonOptions: {
+                        verticalAlign: 'bottom'
+                    }
+                },
+
+                colorAxis: {
+                    type: 'logarithmic',
+                    endOnTick: false,
+                    startOnTick: false,
+                    min: 50000
+                },
+
+                tooltip: {
+                    footerFormat: '<span style="font-size: 10px">(Click for details)</span>'
+                },
+
+                series: [{
+                    data: data,
+                    mapData: mapData,
+                    joinBy: ['iso-a3', 'code3'],
+                    name: 'Current population',
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    states: {
+                        select: {
+                            color: '#a4edba',
+                            borderColor: 'black',
+                            dashStyle: 'shortdot'
+                        }
+                    }
+                }]
+            });
+
+            // Pre-select a country
+            mapChart.get('us').select();
+        }
+    });
+
+</script>
+
+<!--Heat map style-->
+<style>
+    * {
+        font-family: sans-serif;
+    }
+
+    #wrapper {
+        height: 500px;
+        width: 1000px;
+        margin: 0 auto;
+        padding: 0;
+        overflow: visible;
+    }
+
+    #container {
+        float: left;
+        height: 500px;
+        width: 700px;
+        margin: 0;
+    }
+
+    #info {
+        float: left;
+        width: 270px;
+        padding-left: 20px;
+        margin: 100px 0 0 0;
+        border-left: 1px solid silver;
+    }
+
+    #info h2 {
+        display: inline;
+        font-size: 13pt;
+    }
+
+    #info .f32 .flag {
+        vertical-align: bottom !important;
+    }
+
+    #info h4 {
+        margin: 1em 0 0 0;
+    }
+
+    @media screen and (max-width: 920px) {
+
+        #wrapper,
+        #container,
+        #info {
+            float: none;
+            width: 100%;
+            height: auto;
+            margin: 0.5em 0;
+            padding: 0;
+            border: none;
+        }
+    }
+</style>
+
+<!--Tweet collection -->
+<script>
+    $(document).ready(function () {
+        $.getJSON('/tweets/?tf={{tf}}&i={{key}}', function (data) {
+            for (i = 0; i < data.length; i++) {
+                tweet= $("<div>");
+                tweet.html(data[i][1]);
+                tweet.attr({
+                    'class': "container",
+                    'style': "border-style: solid; margin-bottom: 5px');" 
+                }).appendTo("#tweet-board");
+                $('#tweet-board').add('<br>')
+            }
+        });
+
+    });
+</script>
+
+</html>

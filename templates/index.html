@@ -1,0 +1,528 @@
+<!-- views/pages/index.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- views/partials/head.ejs -->
+    <meta charset="UTF-8">
+    <title>Twitter Opinion Visualization</title>
+
+    <!-- CSS (load bootstrap from a CDN) -->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <!-- Popper JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            padding: 0px 0px 0px 0px;
+            margin: 0px 0px 0px 0px;
+        }
+    </style>
+</head>
+
+
+<link rel="icon" href="favicon.ico" type="image/ico">
+<!--Tweet emotion heatmap js files-->
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://code.highcharts.com/maps/highmaps.js"></script>
+<script src="https://code.highcharts.com/maps/modules/data.js"></script>
+<script src="https://code.highcharts.com/maps/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/maps/modules/offline-exporting.js"></script>
+<script src="https://code.highcharts.com/mapdata/custom/world.js"></script>
+
+
+
+<!--end of tweet heat map js files -->
+
+<!-- Tweet time line Graph js files-->
+<!---->
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/series-label.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+
+
+<!--End of timeline js files-->
+
+<body>
+    <!--import header -->
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-dark"
+            style='color:white;background:#2196F3;margin:0px 0px 0px 0px;font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;'>
+            <!-- Brand/logo -->
+            <a class="navbar-brand" href="#">
+                <img src="http://www.stickpng.com/assets/images/58e9196deb97430e819064f6.png" alt="logo"
+                    style="width:40px;">
+            </a>
+
+            <!-- Links -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">About</a>
+                </li>
+
+            </ul>
+            <p style='text-align:right;margin-left:25%;font-size:1.8125rem'>Tweet Emotion Visualization</p>
+        </nav>
+    </header>
+
+    <br>
+    <div style='width:100%;height:100%'>
+        <div class="loader" style='display:none' id='css-wait'></div>
+    </div>
+    <div id='main-div' style='display:block'>
+        <div class="container" style='margin:0px 0px 0px 0px;'>
+            <!-- Nav tabs -->
+
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="#home">Sentiment</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#menu1">Heat Map</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#menu2" id='time-line'>Time Line</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#menu3">Tweets</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#menu4">Word Cloud</a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div id="home" class="container tab-pane active" height='90%'><br>
+                <!--user input form-->
+                <form class="form-inline" action="/analyze/" style='margin-top:9%;margin-left:5%' method='POST'>
+                    <div class="input-group mb-3 input-group-sm" style='margin-right:5px'>
+                        <div class="input-group-prepend">
+                            <span style='background:#2196F3;color:white' class="input-group-text">Keyword</span>
+                        </div>
+                        <input type="keyword" class="form-control" id="keyword" name='keyword'>
+                    </div>
+                    <div class="input-group mb-3 input-group-sm" style='margin-right:5px'>
+                        <div class="input-group-prepend">
+                            <span style='background:#2196F3;color:white' class="input-group-text">From </span>
+                        </div>
+                        <input type="date" class="form-control" id="frmDate" name='frmDate'>
+                    </div>
+                    <div class="input-group mb-3 input-group-sm" style='margin-right:5px'>
+                        <div class="input-group-prepend">
+                            <span style='background:#2196F3;color:white' class="input-group-text">To</span>
+                        </div>
+                        <input type="date" class="form-control" id="toDate" name="toDate">
+                    </div>
+                    <div class="input-group mb-3" style='margin-right:5px'>
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-primary" style='margin-left:4px'
+                                id='trig'>Search</button>
+                        </div>
+                    </div>
+                </form>
+
+
+            </div>
+            <div id="menu1" class="container tab-pane fade"><br>
+                <h3>Heat Map</h3>
+                <!--heat map div area-->
+                <div id="map1" style="height: 500px; min-width: 310px; max-width: 800px; margin: 0 auto"></div>
+
+            </div>
+            <div id="menu2" class="container tab-pane fade"><br>
+                <h3>Timeline</h3>
+                <!--Tweet time line div area-->
+                <div id="container1" style="height: 400px; min-width: 310px">
+
+                </div>
+            </div>
+            <div id="menu4" class="container tab-pane fade"><br>
+                <h3>Word Cloud</h3>
+
+                <!--<div class="media border p-3">-->
+                <div class='row'>
+                    <div class='col-sm-6'>
+                        <h5>Joy</h5>
+                        {% if filename1 %}
+                        <img src="{{filename1}}">
+                        {% else %}
+                        <h1>no image for whatever reason</h1>
+                        {% endif %}
+                    </div>
+                    <div class='col-sm-6'>
+                        <h5>Sad</h5>
+                        {% if filename2 %}
+                        <img src="{{filename2}}">
+                        {% else %}
+                        <h1>no image for whatever reason</h1>
+                        {% endif %}
+                    </div>
+                </div>
+                <br>
+                <div class='row'>
+                    <div class='col-sm-6'>
+                        {% if filename3 %}
+                        <h5>Angry</h5>
+                        <img src="{{filename3}}">
+                        {% else %}
+                        <h1>no image for whatever reason</h1>
+                        {% endif %}
+                    </div>
+                    <div class='col-sm-6'>
+                        <h5>Fear</h5>
+                        {% if filename4 %}
+                        <img src="{{filename4}}">
+                        {% else %}
+                        <h1>no image for whatever reason</h1>
+                        {% endif %}
+                    </div>
+                    <!--</div>-->
+                </div>
+            </div>
+
+            <div id="menu3" class="container tab-pane fade"><br>
+                <h3>Tweets</h3>
+
+                <div class="media border p-3">
+                    <table class="table   table-hover" id='meta_data' style='font-size:10px;'>
+                        <thead class='sticky-top table-primary' style="font-size:14px;background:#2196F3;color:white">
+                            <tr>
+                                <th>Created Date</th>
+                                <th>Tweet Content</th>
+
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    <!-- views/partials/footer.ejs -->
+
+    <div style='position: fixed;bottom: 0;background:#2196F3;color:white;width:100%;padding: 9px 2px 2px 2px'>
+        <p class="text-center">© Copyright 2019 Twitter Sentiment Viz</p>
+    </div>
+
+
+</body>
+
+<!--Tweet time line script area-->
+<script>
+    //Search button click finction
+    $('#tri').click(function (e) {
+        e.preventDefault();
+        var keyword = $('#keyword').val();//Get the keyword from input box
+        $('#main-div').css('display', 'none');//Hide the Background
+        $('#css-wait').css('display', 'block');//Display the csss waiting Animation
+        analyze(keyword);//Call the analyze function
+
+    })
+</script>
+<script>
+
+    //Convert epoch integer to format Y-M-D
+    function epochConvert(time) {
+        //add 19800 to epoch integer to convert GMT to GMT+5:30 time zone
+        d = new Date(parseInt(time.toString() + "000") + 19800);
+        return d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+    }
+
+    //Emotion analyze API will send time with epoch format.
+    //Convert it to readable time
+    function convertr(data) {
+        data = JSON.parse(data)
+        for (i = 0; i < data.length; i++) {
+            data[i][0] = epochConvert(data[i][0]);
+        }
+        return data;
+    }
+
+    //Collect tweet count from each emotion category
+    function getValues(data) {
+        dt = [];
+        data = JSON.parse(data)
+        for (i = 0; i < data.length; i++) {
+            dt.push(data[i][1]);
+        }
+        return dt;
+    }
+
+    //Analyze tweet function
+    function analyze(keyword) {
+        //call the emotion analyze api(GET with keyword)
+        $.getJSON('http://127.0.0.1:5000/analyze/' + keyword, function (data) {
+            console.log(data);
+
+            $('#css-wait').css('display', 'none');//After response by API hide animation
+            $('#main-div').css('display', 'block');//Show background
+            $('#time-line').click();//Click on Timeline tab
+            f = convertr(data['joy']);//Get all the Time value for x axis
+
+            //Get tweet count of all emotion categories
+            fear = getValues(data['fear']);
+            joy = getValues(data['joy']);
+            sad = getValues(data['sadness']);
+            anger = getValues(data['anger']);
+            disgust = getValues(data['disgust']);
+            surprise = getValues(data['surprise']);
+            //console.log(data['fear']);
+
+            //Get all emotion categories
+            cat = [];
+            for (i = 0; i < f.length; i++) {
+                cat.push(f[i][0]);
+            }
+
+            //Generate the tweet wall
+            tweet_meta = data['meta'];
+            //tweet_meta = JSON.parse(tweet_meta)
+
+            //Create table elements and view all tweets
+            var tbody = document.createElement("tbody");
+            for (j = 0; j < tweet_meta.length; j++) {
+                var tr = document.createElement("tr");
+                tr.style.cssText = 'font-size:12px;overflow:scroll;max-width:500px'
+                td1 = document.createElement("td");
+                td1.textContent = tweet_meta[j][0];
+                td2 = document.createElement("td");
+                td2.textContent = tweet_meta[j][1];
+                tr.append(td1);
+                tr.append(td2);
+                tbody.append(tr);
+            }
+
+            document.getElementById('meta_data').append(tbody);
+
+            //View the tweet Timeline
+            Highcharts.chart('container1', {
+                chart: {
+                    type: 'spline'
+                },
+                title: {
+                    text: 'Tweet Emotion Timeline'
+                },
+                subtitle: {
+                    text: 'Keyword : ' + keyword
+                },
+                xAxis: {
+                    categories: cat
+                },
+                yAxis: {
+                    title: {
+                        text: 'Tweet Count'
+                    },
+                    labels: {
+                        formatter: function () {
+                            return this.value;
+                        }
+                    }
+                },
+                tooltip: {
+                    crosshairs: true,
+                    shared: true
+                },
+                plotOptions: {
+                    spline: {
+                        marker: {
+                            radius: 4,
+                            lineColor: '#666666',
+                            lineWidth: 1
+                        }
+                    }
+                },
+                series: [{
+                    name: 'Fear',
+                    marker: {
+                        symbol: 'square'
+                    },
+                    data: fear
+
+                }, {
+                    name: 'Joy',
+                    marker: {
+                        symbol: 'diamond'
+                    },
+                    data: joy
+                },
+                {
+                    name: 'Sadness',
+                    marker: {
+                        symbol: 'diamond'
+                    },
+                    data: sad
+                },
+                {
+                    name: 'Anger',
+                    marker: {
+                        symbol: 'diamond'
+                    },
+                    data: anger
+                },
+                {
+                    name: 'Disgust',
+                    marker: {
+                        symbol: 'diamond'
+                    },
+                    data: disgust
+                },
+                {
+                    name: 'Surprise',
+                    marker: {
+                        symbol: 'diamond'
+                    },
+                    data: surprise
+                }
+                ]
+            });
+        });
+
+    }
+
+</script>
+<!--Heat map js-->
+<script typer='text/javascript'>
+    $.getJSON('https://cdn.jsdelivr.net/gh/highcharts/highcharts@v7.0.0/samples/data/world-population.json', function (data) {
+
+        Highcharts.mapChart('map1', {
+            chart: {
+                borderWidth: 1,
+                map: 'custom/world'
+            },
+
+            title: {
+                text: 'World population 2013 by country'
+            },
+
+            subtitle: {
+                text: 'Demo of Highcharts map with bubbles'
+            },
+
+            legend: {
+                enabled: false
+            },
+
+            mapNavigation: {
+                enabled: true,
+                buttonOptions: {
+                    verticalAlign: 'bottom'
+                }
+            },
+
+            series: [{
+                name: 'Countries',
+                color: '#E0E0E0',
+                enableMouseTracking: false
+            }, {
+                type: 'mapbubble',
+                name: 'Population 2016',
+                joinBy: ['iso-a3', 'code3'],
+                data: data,
+                minSize: 4,
+                maxSize: '12%',
+                tooltip: {
+                    pointFormat: '{point.properties.hc-a2}: {point.z} thousands'
+                }
+            }]
+        });
+    });
+</script>
+<!--heat map js end-->
+
+<!--Waiting animation -->
+<style>
+    /* Center the loader */
+    .loader {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        z-index: 1;
+        width: 150px;
+        height: 150px;
+        margin: -75px 0 0 -75px;
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid #2196F3;
+        width: 120px;
+        height: 120px;
+        -webkit-animation: spin 2s linear infinite;
+        animation: spin 2s linear infinite;
+    }
+
+    @-webkit-keyframes spin {
+        0% {
+            -webkit-transform: rotate(0deg);
+        }
+
+        100% {
+            -webkit-transform: rotate(360deg);
+        }
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Add animation to "page content" */
+    .animate-bottom {
+        position: relative;
+        -webkit-animation-name: animatebottom;
+        -webkit-animation-duration: 1s;
+        animation-name: animatebottom;
+        animation-duration: 1s
+    }
+
+    @-webkit-keyframes animatebottom {
+        from {
+            bottom: -100px;
+            opacity: 0
+        }
+
+        to {
+            bottom: 0px;
+            opacity: 1
+        }
+    }
+
+    @keyframes animatebottom {
+        from {
+            bottom: -100px;
+            opacity: 0
+        }
+
+        to {
+            bottom: 0;
+            opacity: 1
+        }
+    }
+
+    #myDiv {
+        display: none;
+        text-align: center;
+    }
+</style>
+
+<!--waiting animation-->
+
+
+</html>
